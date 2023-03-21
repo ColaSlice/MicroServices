@@ -33,14 +33,10 @@ public class LoginHandler : ILoginHandler
         if (!_databaseHandler.UserExists(_user))
         {
             _databaseHandler.SaveUser(_user);
-
             return _user;
         }
-
-        _user.Username = "";
-        _user.PasswordHash = "";
-        _user.Email = "";
-        _user.License = "";
+        
+        _user.Dispose();
         return _user;
     }
 
@@ -48,29 +44,20 @@ public class LoginHandler : ILoginHandler
     {
         if (_databaseHandler.ReadUser(request).Email != request.Email)
         {
-            _user.Username = "";
-            _user.PasswordHash = "";
-            _user.Email = "";
-            _user.License = "";
+            _user.Dispose();
             return _user;
         }
 
         if (_databaseHandler.ReadUser(request).Username != request.Username)
         {
-            _user.Username = "";
-            _user.PasswordHash = "";
-            _user.Email = "";
-            _user.License = "";
+            _user.Dispose();
 
             return _user;
         }
 
         if (!BCrypt.Net.BCrypt.Verify(request.Password, _databaseHandler.ReadUser(request).PasswordHash))
         {
-            _user.Username = "";
-            _user.PasswordHash = "";
-            _user.Email = "";
-            _user.License = "";
+            _user.Dispose();
 
             return _user;
         }

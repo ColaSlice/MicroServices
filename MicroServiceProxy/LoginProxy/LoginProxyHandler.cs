@@ -26,11 +26,13 @@ public class LoginProxyHandler : ILoginProxyHandler
         try
         {
             response = await _client.PostAsJsonAsync(RegisterUrl, userDto);
+            userDto.Dispose();
             _client.Dispose();
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
+            userDto.Dispose();
             _client.Dispose();
             throw;
         }
@@ -41,6 +43,7 @@ public class LoginProxyHandler : ILoginProxyHandler
     {
         _client.DefaultRequestHeaders.Add("XApiKey", "pgH7QzFHJx4w46fI~5Uzi4RvtTwlEXp");
         var response = await _client.PostAsJsonAsync(LoginUrl, userDto);
+        userDto.Dispose();
         _client.Dispose();
         return response;
     }

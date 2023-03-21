@@ -27,20 +27,14 @@ namespace MicroServiceProxy.Controllers
             
             if (response.StatusCode == HttpStatusCode.BadRequest)
             {
-                _user.Username = "";
-                _user.PasswordHash = "";
-                _user.Email = "";
-                _user.License = "";
+                _user.Dispose();
                 response.Dispose();
                 return BadRequest("User already exist");
             }
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                _user.Username = "";
-                _user.PasswordHash = "";
-                _user.Email = "";
-                _user.License = "";
+                _user.Dispose();
                 response.Dispose();
                 return Problem("Internal problem occured");
             }
@@ -57,20 +51,14 @@ namespace MicroServiceProxy.Controllers
             
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
-                _user.Username = "";
-                _user.PasswordHash = "";
-                _user.Email = "";
-                _user.License = "";
+                _user.Dispose();
                 response.Dispose();
                 return BadRequest("User not found");
             }
             
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                _user.Username = "";
-                _user.PasswordHash = "";
-                _user.Email = "";
-                _user.License = "";
+                _user.Dispose();
                 response.Dispose();
                 return Problem("Internal problem occured");
             }
