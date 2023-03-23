@@ -1,6 +1,5 @@
 using Microsoft.Data.Sqlite;
 using LoginService.Models;
-using LoginService.Services;
 
 namespace LoginService.Database
 {

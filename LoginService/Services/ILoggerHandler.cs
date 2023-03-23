@@ -3,5 +3,5 @@ namespace LoginService.Services;
 
 public interface ILoggerHandler
 {
-    public void Log(LogMessage message);
+    public void Log(string message);
 }

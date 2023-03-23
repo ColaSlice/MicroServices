@@ -6,13 +6,16 @@ using LoginService.Models;
 namespace LoginService.Services;
 public class LoggerHandler : ILoggerHandler
 {
+    private LogMessage _message;
     public LoggerHandler()
     {
-        
+        _message = new LogMessage();
     }
 
-    public void Log(LogMessage message)
+    public void Log(string message)
     {
+        _message.Message = message;
+        _message.Timestamp = DateTime.Now;
         var factory = new ConnectionFactory()
         {
             HostName = "localhost",
@@ -27,7 +30,7 @@ public class LoggerHandler : ILoggerHandler
         
         channel.QueueDeclare("LoginService", durable: true, exclusive: false);
         
-        var jsonString = JsonSerializer.Serialize(message);
+        var jsonString = JsonSerializer.Serialize(_message);
         var body = Encoding.UTF8.GetBytes(jsonString);
         
         channel.BasicPublish("", "LoginService", body: body);

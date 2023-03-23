@@ -27,6 +27,7 @@ namespace LoginService.Controllers
 
             if (_user.Username == "")
             {
+                _user.Dispose();
                 return BadRequest(_user);
             }
             
@@ -40,10 +41,7 @@ namespace LoginService.Controllers
             _user = _loginHandler.Login(request);
             if (_user.Email == "")
             {
-                _user.Email = "";
-                _user.Username = "";
-                _user.PasswordHash = "";
-                _user.License = "";
+                _user.Dispose();
                 return NotFound("User doesn't exist");
             }
 
