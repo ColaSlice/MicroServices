@@ -11,3 +11,10 @@ services:
       - '5672:5672'
     # Web interface
       - '15672:15672'
+    networks:
+      - default
+
+networks:
+  default:
+    name: "data-network"
+    external: true

@@ -1,4 +1,4 @@
-namespace LoginService.Services;
+namespace MicroServiceProxy.Services;
 
 public interface ILoggerHandler
 {
