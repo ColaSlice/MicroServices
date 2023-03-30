@@ -1,3 +1,6 @@
+using LoginService.Models;
+using LoginService.Services;
+
 namespace LoginService.Middleware;
 
 public class ApiKeyMiddleware

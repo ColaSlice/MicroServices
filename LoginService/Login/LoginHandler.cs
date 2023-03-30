@@ -1,5 +1,6 @@
 using LoginService.Database;
 using LoginService.Models;
+using LoginService.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
@@ -10,20 +11,19 @@ public class LoginHandler : ILoginHandler
 {
     private ILoginDatabaseHandler _databaseHandler;
     private readonly IConfiguration _configuration;
+    private ILoggerHandler _loggerHandler;
     private User _user;
-    public LoginHandler(IConfiguration configuration, ILoginDatabaseHandler databaseHandler)
+    public LoginHandler(IConfiguration configuration, ILoginDatabaseHandler databaseHandler, ILoggerHandler loggerHandler)
     {
         _configuration = configuration;
-        _user = new User();
         _databaseHandler = databaseHandler;
+        _loggerHandler = loggerHandler;
+        _user = new User();
     }
 
     public User Register(UserDto request)
     {
-        // Vi får kodeordet som plaintext, men da det er over https, så er det
-        // allerede krypteret når det bliver sendt.
         string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
-        // vvvvv Vi vil ikke have kodeordet til at ligge og flyde rundt.
         request.Password = "";
         _user.Username = request.Username;
         _user.PasswordHash = passwordHash;
@@ -33,14 +33,10 @@ public class LoginHandler : ILoginHandler
         if (!_databaseHandler.UserExists(_user))
         {
             _databaseHandler.SaveUser(_user);
-
             return _user;
         }
-
-        _user.Username = "";
-        _user.PasswordHash = "";
-        _user.Email = "";
-        _user.License = "";
+        
+        _user.Dispose();
         return _user;
     }
 
@@ -48,30 +44,21 @@ public class LoginHandler : ILoginHandler
     {
         if (_databaseHandler.ReadUser(request).Email != request.Email)
         {
-            _user.Username = "";
-            _user.PasswordHash = "";
-            _user.Email = "";
-            _user.License = "";
+            _loggerHandler.Log("Error, email is not recognised");
+            _user.Dispose();
             return _user;
         }
 
         if (_databaseHandler.ReadUser(request).Username != request.Username)
         {
-            _user.Username = "";
-            _user.PasswordHash = "";
-            _user.Email = "";
-            _user.License = "";
-
+            _loggerHandler.Log("Error, username is not recognised");
+            _user.Dispose();
             return _user;
         }
 
         if (!BCrypt.Net.BCrypt.Verify(request.Password, _databaseHandler.ReadUser(request).PasswordHash))
         {
-            _user.Username = "";
-            _user.PasswordHash = "";
-            _user.Email = "";
-            _user.License = "";
-
+            _user.Dispose();
             return _user;
         }
 

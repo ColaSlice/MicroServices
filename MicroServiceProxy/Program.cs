@@ -1,4 +1,6 @@
 using MicroServiceProxy.LoginProxy;
+using MicroServiceProxy.Services;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 const string myAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -11,6 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ILoginProxyHandler, LoginProxyHandler>();
+builder.Services.AddScoped<ILoggerHandler, LoggerHandler>();
 
 builder.Services.AddCors(options =>
 {
@@ -23,6 +26,11 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -30,7 +38,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+    app.UseHttpsRedirection();
+}
 
 app.UseCors(myAllowSpecificOrigins);
 

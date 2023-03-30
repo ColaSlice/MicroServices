@@ -1,12 +1,11 @@
-using LoginService.Models;
 using Microsoft.Data.Sqlite;
-using SQLitePCL;
+using LoginService.Models;
 
 namespace LoginService.Database
 {
     public class LoginDatabaseHandler : ILoginDatabaseHandler
     {
-        private const string DataSourceString = @"Data Source=:in-memory:";
+        private const string DataSourceString = @"Data Source=TestLoginDatabase";
         private readonly SqliteConnection _connection;
         private User _user;
 
@@ -15,7 +14,7 @@ namespace LoginService.Database
             _user = new User();
             _connection = new SqliteConnection(DataSourceString);
             _connection.Open();
-            SqliteCommand _cmd = new SqliteCommand("CREATE TABLE Login (id INTEGER NOT NULL UNIQUE, username	TEXT NOT NULL, passwordhash	TEXT NOT NULL, email TEXT NOT NULL, license	TEXT NOT NULL, PRIMARY KEY(id AUTOINCREMENT));", _connection);
+            SqliteCommand _cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS Login (id INTEGER NOT NULL UNIQUE, username	TEXT NOT NULL, passwordhash	TEXT NOT NULL, email TEXT NOT NULL, license	TEXT NOT NULL, PRIMARY KEY(id AUTOINCREMENT));", _connection);
             _cmd.Prepare();
             _cmd.ExecuteNonQuery();
         }

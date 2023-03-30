@@ -1,7 +1,7 @@
-using System.Configuration;
 using LoginService.Database;
 using LoginService.Login;
 using LoginService.Middleware;
+using LoginService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +16,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<LoginHandler>();
 builder.Services.AddScoped<ILoginDatabaseHandler, LoginDatabaseHandler>();
 builder.Services.AddScoped<ILoginHandler, LoginHandler>();
+builder.Services.AddScoped<ILoggerHandler, LoggerHandler>();
 
 var app = builder.Build();
 
@@ -26,7 +27,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseMiddleware<ApiKeyMiddleware>();
+app.UseMiddleware<ApiKeyMiddleware>();
 
 app.UseHttpsRedirection();
 
