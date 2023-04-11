@@ -1,4 +1,5 @@
 using MicroServiceProxy.LoginProxy;
+using MicroServiceProxy.MessageProxy;
 using MicroServiceProxy.Services;
 using Microsoft.AspNetCore.HttpOverrides;
 
@@ -14,6 +15,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ILoginProxyHandler, LoginProxyHandler>();
 builder.Services.AddScoped<ILoggerHandler, LoggerHandler>();
+builder.Services.AddScoped<IMessageProxyHandler, MessageProxyHandler>();
 
 builder.Services.AddCors(options =>
 {

@@ -1,7 +1,9 @@
 using System.Net;
 using MicroServiceProxy.Models;
 using MicroServiceProxy.LoginProxy;
+using MicroServiceProxy.MessageProxy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 
 namespace MicroServiceProxy.Controllers
 {
@@ -13,11 +15,13 @@ namespace MicroServiceProxy.Controllers
         private static User _user = new User();
         private Tokens _tokens;
         private ILoginProxyHandler _loginProxyHandler;
+        private IMessageProxyHandler _messageProxyHandler;
         
-        public ProxyController(ILoginProxyHandler loginProxyHandler)
+        public ProxyController(ILoginProxyHandler loginProxyHandler, IMessageProxyHandler messageProxyHandler)
         {
             _tokens = new Tokens();
             _loginProxyHandler = loginProxyHandler;
+            _messageProxyHandler = messageProxyHandler;
         }
 
         [HttpPost("register")]
@@ -66,6 +70,20 @@ namespace MicroServiceProxy.Controllers
             _tokens.Token = await response.Content.ReadAsStringAsync();
             response.Dispose();
             return Ok(_tokens);
+        }
+        
+        [HttpPost("sendmessage")]
+        public async Task<ActionResult<string>> SendMessage(MessageDto messageDto)
+        {
+            var response = await _messageProxyHandler.SendMessage(messageDto);
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                _user.Dispose();
+                response.Dispose();
+                return Problem("Internal problem occured");
+            }
+
+            return Ok(response);
         }
     }
 }
