@@ -75,15 +75,20 @@ namespace MicroServiceProxy.Controllers
         [HttpPost("sendmessage")]
         public async Task<ActionResult<string>> SendMessage(MessageDto messageDto)
         {
+            var userResponse = await _loginProxyHandler.ValidateUser(messageDto);
+            if (userResponse.StatusCode != HttpStatusCode.OK)
+            {
+                userResponse.Dispose();
+                return NotFound();
+            }
             var response = await _messageProxyHandler.SendMessage(messageDto);
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                _user.Dispose();
                 response.Dispose();
                 return Problem("Internal problem occured");
             }
 
-            return Ok(response);
+            return Ok(await response.Content.ReadAsStringAsync());
         }
     }
 }

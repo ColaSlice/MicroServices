@@ -19,7 +19,7 @@ public class LoggerHandler : ILoggerHandler
         var factory = new ConnectionFactory()
         {
             HostName = "localhost",
-            UserName = "user",
+            UserName = "service",
             Password = "pass",
             VirtualHost = "/"
         };

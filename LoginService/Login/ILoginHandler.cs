@@ -6,6 +6,7 @@ namespace LoginService.Login
     {
         public User Register(UserDto request);
         public User Login(UserDto request);
+        public bool ValidateUser(MessageDto messageDto);
         public string CreateToken(User user);
     }
 }

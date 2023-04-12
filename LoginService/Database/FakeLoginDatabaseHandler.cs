@@ -5,6 +5,11 @@ namespace LoginService.Database
     public class FakeLoginDatabaseHandler : ILoginDatabaseHandler
     {
         private readonly List<User> _users = new List<User>();
+        public bool UsernameExists(MessageDto messageDto)
+        {
+            throw new NotImplementedException();
+        }
+
         public User ReadUser(UserDto request)
         {
             return _users.FirstOrDefault(x => x.Username == request.Username)!;

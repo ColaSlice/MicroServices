@@ -52,6 +52,25 @@ namespace LoginService.Database
             }
             return false;
         }
+        
+        public bool UsernameExists(MessageDto messageDto)
+        {
+            using (SqliteCommand _cmd = new SqliteCommand("SELECT username FROM login WHERE username=@username", _connection))
+            {
+                _cmd.Parameters.AddWithValue("@username", messageDto.User);
+                using (SqliteDataReader reader = _cmd.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        _connection.Close();
+                        _connection.Dispose();
+                        _cmd.Dispose();
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
 
         public User ReadUser(UserDto request)
         {

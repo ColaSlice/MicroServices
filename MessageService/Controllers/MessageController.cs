@@ -1,3 +1,4 @@
+using MessageService.Message;
 using Microsoft.AspNetCore.Mvc;
 using MessageService.Models;
 
@@ -7,16 +8,16 @@ namespace MessageService.Controllers
     [Route("api/[controller]")]
     public class MessageController : ControllerBase
     {
-        public MessageController()
+        private IMessageHandler _messageHandler;
+        public MessageController(IMessageHandler messageHandler)
         {
-            
+            _messageHandler = messageHandler;
         }
 
         [HttpPost("sendmessage")]
         public ActionResult<string> SendMessage(MessageDto messageDto)
         {
-            Console.Error.WriteLine("asd");
-            return Ok("abc");
+            return Ok(_messageHandler.SendMessage(messageDto));
         }
     }
 }

@@ -6,6 +6,7 @@ namespace LoginService.Database
     {
         public void SaveUser(User user);
         public bool UserExists(User user);
+        public bool UsernameExists(MessageDto messageDto);
         public User ReadUser(UserDto request);
 
     }

@@ -19,6 +19,5 @@
 
     <ItemGroup>
       <Folder Include="Controllers" />
-      <Folder Include="Message" />
     </ItemGroup>
 </Project>

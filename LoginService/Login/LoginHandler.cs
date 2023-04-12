@@ -69,7 +69,17 @@ public class LoginHandler : ILoginHandler
 
         return _user;
     }
+    
+    public bool ValidateUser(MessageDto messageDto)
+    {
+        if (_databaseHandler.UsernameExists(messageDto))
+        {
+            return true;
+        }
 
+        return false;
+    }
+    
     public string CreateToken(User user)
     {
         List<Claim> claims = new List<Claim> {
@@ -91,4 +101,6 @@ public class LoginHandler : ILoginHandler
 
         return jwt;
     }
+
+    
 }

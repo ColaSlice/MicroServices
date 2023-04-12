@@ -10,6 +10,7 @@ namespace LoginService.Controllers
     public class AuthController : ControllerBase
     {
         private User _user;
+        private bool _usernameExists;
         private Tokens _tokens;
         private ILoginHandler _loginHandler;
 
@@ -48,6 +49,19 @@ namespace LoginService.Controllers
             _tokens.Token = _loginHandler.CreateToken(_user);
             
             return Ok(_tokens);
+        }
+        
+        [HttpPost("validateuser")]
+        public ActionResult<Tokens> ValidateUser(MessageDto messageDto)
+        {
+            Console.WriteLine("hej");
+            _usernameExists = _loginHandler.ValidateUser(messageDto);
+            if (!_usernameExists)
+            {
+                return NotFound("User doesn't exist");
+            }
+
+            return Ok(messageDto);
         }
         
         [HttpGet]

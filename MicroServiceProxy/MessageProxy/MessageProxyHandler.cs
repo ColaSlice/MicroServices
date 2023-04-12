@@ -6,7 +6,7 @@ namespace MicroServiceProxy.MessageProxy;
 public class MessageProxyHandler : IMessageProxyHandler
 {
     private readonly HttpClient _client;
-    private const string SendMessageUrl = @"http://localhost:5003/api/Message/sendmessage";
+    private const string SendMessageUrl = @"http://message-service:5003/api/Message/sendmessage";
     // Do not do this in production vvv https://stackoverflow.com/questions/52939211/the-ssl-connection-could-not-be-established
     private readonly HttpClientHandler _clientHandler = new HttpClientHandler();
     private ILoggerHandler _loggerHandler;
