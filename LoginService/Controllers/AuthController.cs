@@ -64,10 +64,10 @@ namespace LoginService.Controllers
             return Ok(messageDto);
         }
         
-        [HttpGet]
-        public ActionResult Get()
+        [HttpGet("status")]
+        public ActionResult<bool> GetStatus()
         {
-            return Ok("1.0.0");
+            return Ok("Running");
         }
     }
 }

@@ -1,4 +1,5 @@
 using System.Net;
+using MicroServiceProxy.DatabaseProxy;
 using MicroServiceProxy.Models;
 using MicroServiceProxy.LoginProxy;
 using MicroServiceProxy.MessageProxy;
@@ -16,12 +17,16 @@ namespace MicroServiceProxy.Controllers
         private Tokens _tokens;
         private ILoginProxyHandler _loginProxyHandler;
         private IMessageProxyHandler _messageProxyHandler;
+        private IDatabaseProxy _databaseProxy;
+        private List<string> _services;
         
-        public ProxyController(ILoginProxyHandler loginProxyHandler, IMessageProxyHandler messageProxyHandler)
+        public ProxyController(ILoginProxyHandler loginProxyHandler, IMessageProxyHandler messageProxyHandler, IDatabaseProxy databaseProxy)
         {
             _tokens = new Tokens();
             _loginProxyHandler = loginProxyHandler;
             _messageProxyHandler = messageProxyHandler;
+            _databaseProxy = databaseProxy;
+            _services = new List<string>();
         }
 
         [HttpPost("register")]
@@ -70,6 +75,42 @@ namespace MicroServiceProxy.Controllers
             _tokens.Token = await response.Content.ReadAsStringAsync();
             response.Dispose();
             return Ok(_tokens);
+        }
+        
+        [HttpGet("getlogs")]
+        public async Task<ActionResult<List<LogMessage>>> GetLogs()
+        {
+            var response = await _databaseProxy.GetLogs();
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                response.Dispose();
+                return NotFound();
+            }
+            return Ok(await response.Content.ReadFromJsonAsync<List<LogMessage>>());
+        }
+        
+        [HttpGet("getmessages")]
+        public async Task<ActionResult<List<MessageDto>>> GetMessages(string toUser, string user)
+        {
+            var response = await _databaseProxy.GetMessages(toUser, user);
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                response.Dispose();
+                return NotFound();
+            }
+            return Ok(await response.Content.ReadFromJsonAsync<List<MessageDto>>());
+        }
+        
+        [HttpPost("savelog")]
+        public async Task<ActionResult> SaveLog(LogMessage logMessage)
+        {
+            var response = await _databaseProxy.SaveLog(logMessage);
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                response.Dispose();
+                return NotFound();
+            }
+            return Ok();
         }
         
         [HttpPost("sendmessage")]

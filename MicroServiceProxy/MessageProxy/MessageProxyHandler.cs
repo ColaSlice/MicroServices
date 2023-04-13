@@ -1,3 +1,4 @@
+using System.Net;
 using MicroServiceProxy.Models;
 using MicroServiceProxy.Services;
 
@@ -7,6 +8,7 @@ public class MessageProxyHandler : IMessageProxyHandler
 {
     private readonly HttpClient _client;
     private const string SendMessageUrl = @"http://message-service:5003/api/Message/sendmessage";
+    private const string ServiceStatusUrl = @"http://message-service:5003/api/Message/status";
     // Do not do this in production vvv https://stackoverflow.com/questions/52939211/the-ssl-connection-could-not-be-established
     private readonly HttpClientHandler _clientHandler = new HttpClientHandler();
     private ILoggerHandler _loggerHandler;
@@ -37,5 +39,26 @@ public class MessageProxyHandler : IMessageProxyHandler
             throw;
         }
         return response;
+    }
+    
+    public async Task<bool> GetStatus()
+    {
+        _client.DefaultRequestHeaders.Add("XApiKey", "pgH7QzFHJx4w46fI~5Uzi4RvtTwlEXp");
+        HttpResponseMessage response;
+        try
+        {
+            response = await _client.GetAsync(ServiceStatusUrl);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            return false;
+        }
+        return true;
     }
 }

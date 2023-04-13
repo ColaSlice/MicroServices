@@ -19,5 +19,17 @@ namespace MessageService.Controllers
         {
             return Ok(_messageHandler.SendMessage(messageDto));
         }
+        
+        [HttpPost("getmessage")]
+        public ActionResult<string> GetMessage(MessageDto messageDto)
+        {
+            return Ok(_messageHandler.GetMessage());
+        }
+
+        [HttpGet("status")]
+        public ActionResult<bool> GetStatus()
+        {
+            return Ok("Running");
+        }
     }
 }

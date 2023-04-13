@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DatabaseService.Database;
+using DatabaseService.Enums;
+using DatabaseService.Models;
+using MessageService.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,36 +15,52 @@ namespace DatabaseService.Controllers
     [ApiController]
     public class DatabaseController : ControllerBase
     {
-        // GET: api/Database
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private IDatabaseHandler _databaseHandler;
+        public DatabaseController(IDatabaseHandler databaseHandler)
         {
-            return new string[] { "value1", "value2" };
+            _databaseHandler = databaseHandler;
         }
 
-        // GET: api/Database/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        // GET: api/Database/getlogs
+        [HttpGet("getlogs")]
+        public List<LogMessage> GetLogs()
         {
-            return "value";
+            return _databaseHandler.ReadLogs(null);
+        }
+        
+        // GET: api/Database/getmessages
+        [HttpGet("getmessages")]
+        public List<MessageDto> GetMessages(string toUser, string user)
+        {
+            return _databaseHandler.ReadMessage(null, toUser, user);
         }
 
-        // POST: api/Database
-        [HttpPost]
-        public void Post([FromBody] string value)
+        // POST: api/Database/savelog
+        [HttpPost("savelog")]
+        public async Task<ActionResult> SaveLog(LogMessage logMessage)
         {
+            _databaseHandler.Save(Types.Log, null, logMessage);
+            return Ok();
         }
-
-        // PUT: api/Database/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        
+        // POST: api/Database/savemessage
+        [HttpPost("savemessage")]
+        public async Task<ActionResult> SaveMessage(MessageDto messageDto)
         {
+            _databaseHandler.Save(Types.Message, messageDto, null);
+            return Ok();
         }
-
+        
         // DELETE: api/Database/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+        
+        [HttpGet("status")]
+        public ActionResult<bool> GetStatus()
+        {
+            return Ok("Running");
         }
     }
 }
