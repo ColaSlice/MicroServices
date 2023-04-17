@@ -9,9 +9,9 @@ namespace LoginService.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private User _user;
+        private static User _user;
         private bool _usernameExists;
-        private Tokens _tokens;
+        private static Tokens _tokens;
         private ILoginHandler _loginHandler;
 
         public AuthController(ILoginHandler loginHandler)
@@ -22,9 +22,9 @@ namespace LoginService.Controllers
         }
 
         [HttpPost("register")]
-        public ActionResult<User> RegisterUser(UserDto request)
+        public async ValueTask<ActionResult<User>> RegisterUser(UserDto request)
         {
-            _user = _loginHandler.Register(request);
+            _user = await _loginHandler.Register(request);
 
             if (_user.Username == "")
             {
@@ -54,7 +54,6 @@ namespace LoginService.Controllers
         [HttpPost("validateuser")]
         public ActionResult<Tokens> ValidateUser(MessageDto messageDto)
         {
-            Console.WriteLine("hej");
             _usernameExists = _loginHandler.ValidateUser(messageDto);
             if (!_usernameExists)
             {

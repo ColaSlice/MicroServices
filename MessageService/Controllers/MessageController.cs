@@ -15,15 +15,17 @@ namespace MessageService.Controllers
         }
 
         [HttpPost("sendmessage")]
-        public ActionResult<string> SendMessage(MessageDto messageDto)
+        public async Task<ActionResult<MessageDto>> SendMessage(MessageDto messageDto)
         {
-            return Ok(_messageHandler.SendMessage(messageDto));
+            var response = await _messageHandler.SendMessage(messageDto);
+            return Ok(response);
         }
         
         [HttpPost("getmessage")]
-        public ActionResult<string> GetMessage(MessageDto messageDto)
+        public async Task<ActionResult<MessageDto>> GetMessage(string toUser, string user)
         {
-            return Ok(_messageHandler.GetMessage());
+            var response = await _messageHandler.GetMessage(toUser, user);
+            return Ok(response);
         }
 
         [HttpGet("status")]

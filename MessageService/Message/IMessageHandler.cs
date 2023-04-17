@@ -5,6 +5,6 @@ namespace MessageService.Message;
 
 public interface IMessageHandler
 {
-    public string SendMessage(MessageDto messageDto);
-    public string GetMessage();
+    public Task<HttpResponseMessage> SendMessage(MessageDto messageDto);
+    public Task<HttpResponseMessage> GetMessage(string toUser, string user);
 }

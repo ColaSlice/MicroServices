@@ -8,11 +8,13 @@ namespace MicroServiceProxy.LoginProxy;
 
 public class LoginProxyHandler : ILoginProxyHandler
 {
+// login-service
+// localhost
     private readonly HttpClient _client;
-    private const string LoginUrl = @"http://login-service:5001/api/Auth/login";
-    private const string RegisterUrl = @"http://login-service:5001/api/Auth/register";
-    private const string ServiceStatus = @"http://login-service:5001/api/Auth/status";
-    private const string ValidateUserUrl = @"http://login-service:5001/api/Auth/validateuser";
+    private const string LoginUrl = @"http://localhost:5001/api/Auth/login";
+    private const string RegisterUrl = @"http://localhost:5001/api/Auth/register";
+    private const string ServiceStatus = @"http://localhost:5001/api/Auth/status";
+    private const string ValidateUserUrl = @"http://localhost:5001/api/Auth/validateuser";
     // Do not do this in production vvv https://stackoverflow.com/questions/52939211/the-ssl-connection-could-not-be-established
     private readonly HttpClientHandler _clientHandler = new HttpClientHandler();
     private ILoggerHandler _loggerHandler;
@@ -26,7 +28,7 @@ public class LoginProxyHandler : ILoginProxyHandler
         _loggerHandler = loggerHandler;
     }
 
-    public async Task<HttpResponseMessage> Register(UserDto userDto)
+    public async ValueTask<HttpResponseMessage> Register(UserDto userDto)
     {
         _client.DefaultRequestHeaders.Add("XApiKey", "pgH7QzFHJx4w46fI~5Uzi4RvtTwlEXp");
         HttpResponseMessage response;
@@ -47,7 +49,7 @@ public class LoginProxyHandler : ILoginProxyHandler
         return response;
     }
 
-    public async Task<HttpResponseMessage> Login(UserDto userDto)
+    public async ValueTask<HttpResponseMessage> Login(UserDto userDto)
     {
         _client.DefaultRequestHeaders.Add("XApiKey", "pgH7QzFHJx4w46fI~5Uzi4RvtTwlEXp");
         var response = await _client.PostAsJsonAsync(LoginUrl, userDto);
@@ -56,7 +58,7 @@ public class LoginProxyHandler : ILoginProxyHandler
         return response;
     }
 
-    public async Task<HttpResponseMessage> ValidateUser(MessageDto messageDto)
+    public async ValueTask<HttpResponseMessage> ValidateUser(MessageDto messageDto)
     {
         _client.DefaultRequestHeaders.Add("XApiKey", "pgH7QzFHJx4w46fI~5Uzi4RvtTwlEXp");
         var response = await _client.PostAsJsonAsync(ValidateUserUrl, messageDto);
@@ -68,7 +70,7 @@ public class LoginProxyHandler : ILoginProxyHandler
         return response;
     }
 
-    public async Task<bool> GetStatus()
+    public async ValueTask<bool> GetStatus()
     {
         _client.DefaultRequestHeaders.Add("XApiKey", "pgH7QzFHJx4w46fI~5Uzi4RvtTwlEXp");
         HttpResponseMessage response;

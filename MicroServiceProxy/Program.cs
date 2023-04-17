@@ -17,7 +17,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ILoginProxyHandler, LoginProxyHandler>();
 builder.Services.AddScoped<ILoggerHandler, LoggerHandler>();
 builder.Services.AddScoped<IMessageProxyHandler, MessageProxyHandler>();
-builder.Services.AddScoped<IDatabaseProxy, DatabaseProxy>();
+builder.Services.AddScoped<IDatabaseProxyHandler, DatabaseProxyHandler>();
 
 builder.Services.AddCors(options =>
 {

@@ -11,21 +11,21 @@ namespace MicroServiceProxy.Controllers
     //ApiController needs to come before the route. Oh, and these [ApiController] is called a decorator, I think.
     [ApiController]
     [Route("api/[controller]")]
-    public class ProxyController : ControllerBase
+    public class LoginProxyController : ControllerBase
     {
         private static User _user = new User();
         private Tokens _tokens;
         private ILoginProxyHandler _loginProxyHandler;
         private IMessageProxyHandler _messageProxyHandler;
-        private IDatabaseProxy _databaseProxy;
+        private IDatabaseProxyHandler _databaseProxyHandler;
         private List<string> _services;
         
-        public ProxyController(ILoginProxyHandler loginProxyHandler, IMessageProxyHandler messageProxyHandler, IDatabaseProxy databaseProxy)
+        public LoginProxyController(ILoginProxyHandler loginProxyHandler, IMessageProxyHandler messageProxyHandler, IDatabaseProxyHandler databaseProxyHandler)
         {
             _tokens = new Tokens();
             _loginProxyHandler = loginProxyHandler;
             _messageProxyHandler = messageProxyHandler;
-            _databaseProxy = databaseProxy;
+            _databaseProxyHandler = databaseProxyHandler;
             _services = new List<string>();
         }
 
@@ -76,60 +76,11 @@ namespace MicroServiceProxy.Controllers
             response.Dispose();
             return Ok(_tokens);
         }
-        
-        [HttpGet("getlogs")]
-        public async Task<ActionResult<List<LogMessage>>> GetLogs()
-        {
-            var response = await _databaseProxy.GetLogs();
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                response.Dispose();
-                return NotFound();
-            }
-            return Ok(await response.Content.ReadFromJsonAsync<List<LogMessage>>());
-        }
-        
-        [HttpGet("getmessages")]
-        public async Task<ActionResult<List<MessageDto>>> GetMessages(string toUser, string user)
-        {
-            var response = await _databaseProxy.GetMessages(toUser, user);
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                response.Dispose();
-                return NotFound();
-            }
-            return Ok(await response.Content.ReadFromJsonAsync<List<MessageDto>>());
-        }
-        
-        [HttpPost("savelog")]
-        public async Task<ActionResult> SaveLog(LogMessage logMessage)
-        {
-            var response = await _databaseProxy.SaveLog(logMessage);
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                response.Dispose();
-                return NotFound();
-            }
-            return Ok();
-        }
-        
-        [HttpPost("sendmessage")]
-        public async Task<ActionResult<string>> SendMessage(MessageDto messageDto)
-        {
-            var userResponse = await _loginProxyHandler.ValidateUser(messageDto);
-            if (userResponse.StatusCode != HttpStatusCode.OK)
-            {
-                userResponse.Dispose();
-                return NotFound();
-            }
-            var response = await _messageProxyHandler.SendMessage(messageDto);
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                response.Dispose();
-                return Problem("Internal problem occured");
-            }
 
-            return Ok(await response.Content.ReadAsStringAsync());
+        [HttpPost("validateuser")]
+        public async Task<ActionResult> ValidateUser(UserDto userDto)
+        {
+            return Problem("Not implemented yet");
         }
     }
 }

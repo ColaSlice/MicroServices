@@ -15,12 +15,17 @@ namespace LoginService.Database
             return _users.FirstOrDefault(x => x.Username == request.Username)!;
         }
 
-        public void SaveUser(User user)
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async ValueTask SaveUser(User user)
         {
             _users.Add(user);
         }
 
-        public bool UserExists(User user)
+        public async ValueTask<bool> UserExists(User user)
         {
             return _users.Contains(user);
         }

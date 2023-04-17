@@ -12,7 +12,7 @@ public class LoginHandler : ILoginHandler
     private ILoginDatabaseHandler _databaseHandler;
     private readonly IConfiguration _configuration;
     private ILoggerHandler _loggerHandler;
-    private User _user;
+    private static User _user;
     public LoginHandler(IConfiguration configuration, ILoginDatabaseHandler databaseHandler, ILoggerHandler loggerHandler)
     {
         _configuration = configuration;
@@ -21,7 +21,7 @@ public class LoginHandler : ILoginHandler
         _user = new User();
     }
 
-    public User Register(UserDto request)
+    public async Task<User> Register(UserDto request)
     {
         string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
         request.Password = "";
@@ -30,13 +30,14 @@ public class LoginHandler : ILoginHandler
         _user.Email = request.Email;
         _user.License = request.License;
 
-        if (!_databaseHandler.UserExists(_user))
+        if (!await _databaseHandler.UserExists(_user))
         {
-            _databaseHandler.SaveUser(_user);
+            await _databaseHandler.SaveUser(_user);
             return _user;
         }
         
         _user.Dispose();
+        _databaseHandler.Dispose();
         return _user;
     }
 
@@ -66,7 +67,8 @@ public class LoginHandler : ILoginHandler
         _user.PasswordHash = _databaseHandler.ReadUser(request).PasswordHash;
         _user.Email = request.Email;
         _user.License = request.License;
-
+        _databaseHandler.Dispose();
+        
         return _user;
     }
     
@@ -86,17 +88,17 @@ public class LoginHandler : ILoginHandler
             new Claim(ClaimTypes.Name, user.Username)
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+        SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
             _configuration.GetSection("AppSettings:Token").Value!));
 
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+        SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
-        var token = new JwtSecurityToken(
+        JwtSecurityToken token = new JwtSecurityToken(
             claims: claims,
             expires: DateTime.Now.AddDays(1),
             signingCredentials: creds
         );
-
+        
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
         return jwt;

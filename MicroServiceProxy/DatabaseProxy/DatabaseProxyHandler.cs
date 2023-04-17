@@ -1,20 +1,25 @@
+using System.Net;
 using MicroServiceProxy.Models;
 using MicroServiceProxy.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MicroServiceProxy.DatabaseProxy;
 
-public class DatabaseProxy : IDatabaseProxy
+public class DatabaseProxyHandler : IDatabaseProxyHandler
 {
     private readonly HttpClient _client;
     private readonly HttpClientHandler _clientHandler = new HttpClientHandler();
     private ILoggerHandler _loggerHandler;
+    
+    // database-service:5004
+    // localhost:5004
     private const string _getLogsUrl = @"http://localhost:5004/api/Database/getlogs";
     private string _getMessageUrl = @"http://localhost:5004/api/Database/getmessages?";
     private const string _saveLogUrl = @"http://localhost:5004/api/Database/savelog";
-    private const string _saveMessage = @"";
+    private const string _saveMessage = @"http://localhost:5004/api/Database/savemessage";
+    private const string ServiceStatusUrl = @"http://localhost:5004/api/Database/status";
 
-    public DatabaseProxy(ILoggerHandler loggerHandler)
+    public DatabaseProxyHandler(ILoggerHandler loggerHandler)
     {
         // Do not do this in production vvv
         _clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
@@ -86,8 +91,43 @@ public class DatabaseProxy : IDatabaseProxy
         return response;
     }
 
-    public Task<HttpResponseMessage> SaveMessage(MessageDto messageDto)
+    public async Task<HttpResponseMessage> SaveMessage(MessageDto messageDto)
     {
-        throw new NotImplementedException();
+        _client.DefaultRequestHeaders.Add("XApiKey", "pgH7QzFHJx4w46fI~5Uzi4RvtTwlEXp");
+        HttpResponseMessage response;
+        try
+        {
+            response = await _client.PostAsJsonAsync(_saveMessage, messageDto);
+            _client.Dispose();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            //_loggerHandler.Log($"Exception: {e}");
+            _client.Dispose();
+            throw;
+        }
+        return response;
+    }
+    
+    public async Task<bool> GetStatus()
+    {
+        _client.DefaultRequestHeaders.Add("XApiKey", "pgH7QzFHJx4w46fI~5Uzi4RvtTwlEXp");
+        HttpResponseMessage response;
+        try
+        {
+            response = await _client.GetAsync(ServiceStatusUrl);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            return false;
+        }
+        return true;
     }
 }
