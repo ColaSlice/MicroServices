@@ -37,12 +37,12 @@ namespace MicroServiceProxy.Controllers
             _endpoints.Add("POST: api/LoginProxy/login");
             _endpoints.Add("POST: api/LoginProxy/validateUser");
             _endpoints.Add("================================");
-            _endpoints.Add("POST: api/DatabaseProxy/getmessages");
-            _endpoints.Add("GET:  api/DatabaseProxy/savemessage");
+            _endpoints.Add("GET:  api/DatabaseProxy/getmessages");
+            _endpoints.Add("POST: api/DatabaseProxy/savemessage");
             _endpoints.Add("GET:  api/DatabaseProxy/getlogs");
-            _endpoints.Add("GET:  api/DatabaseProxy/savelog");
+            _endpoints.Add("POST: api/DatabaseProxy/savelog");
             _endpoints.Add("================================");
-            _endpoints.Add("GET:  api/MessageProxy/sendmessage");
+            _endpoints.Add("POST: api/MessageProxy/sendmessage");
             _endpoints.Add("================================");
             _endpoints.Add("GET:  api/SystemInfo/getendpoints");
             _endpoints.Add("GET:  api/SystemInfo/getstatus");

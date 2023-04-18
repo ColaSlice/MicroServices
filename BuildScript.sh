@@ -2,7 +2,7 @@
 clear
 cd LoggerMachine
 echo '======================'
-echo 'Building LoggerMachine'
+echo 'Building [1/5]: LoggerMachine'
 echo '======================'
 
 dotnet publish -c Release
@@ -18,7 +18,7 @@ cd LoginService
 clear
 
 echo '======================'
-echo 'Building LoginService'
+echo 'Building [2/5]: LoginService'
 echo '======================'
 
 docker build --rm -t prod/loginservice:testing .
@@ -34,7 +34,7 @@ cd MicroServiceProxy
 clear
 
 echo '======================'
-echo 'Building ProxyService'
+echo 'Building [3/5]: ProxyService'
 echo '======================'
 
 docker build --rm -t prod/proxyservice:testing .
@@ -50,7 +50,7 @@ cd MessageService
 clear
 
 echo '======================'
-echo 'Building MessageService'
+echo 'Building [4/5]: MessageService'
 echo '======================'
 
 docker build --rm -t prod/messageservice:testing .
@@ -66,7 +66,7 @@ cd DatabaseService
 clear
 
 echo '======================'
-echo 'Building DatabaseService'
+echo 'Building [5/5]: DatabaseService'
 echo '======================'
 
 docker build --rm -t prod/databaseservice:testing .

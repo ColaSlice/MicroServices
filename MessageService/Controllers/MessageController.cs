@@ -17,14 +17,15 @@ namespace MessageService.Controllers
         [HttpPost("sendmessage")]
         public async Task<ActionResult<MessageDto>> SendMessage(MessageDto messageDto)
         {
+            Console.WriteLine(messageDto.Message);
             var response = await _messageHandler.SendMessage(messageDto);
             return Ok(response);
         }
         
         [HttpPost("getmessage")]
-        public async Task<ActionResult<MessageDto>> GetMessage(string toUser, string user)
+        public async Task<ActionResult<MessageDto>> GetMessage(string toUser)
         {
-            var response = await _messageHandler.GetMessage(toUser, user);
+            var response = await _messageHandler.GetMessage(toUser);
             return Ok(response);
         }
 

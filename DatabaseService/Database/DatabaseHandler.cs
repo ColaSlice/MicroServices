@@ -56,7 +56,7 @@ namespace DatabaseService.Database
             }
         }
 
-        public List<MessageDto> ReadMessage(DateTime? timeStamp, string toUser, string fromUser)
+        public List<MessageDto> ReadMessage(DateTime? timeStamp, string toUser)
         {
             using (var _liteDatabase = new LiteDatabase(_messages))
             {
@@ -64,9 +64,12 @@ namespace DatabaseService.Database
 
                 var messages = collection.Query()
                     .Where(x => x.ToUser == toUser)
-                    .Where(x => x.User == fromUser)
                     .ToList();
-                Console.WriteLine("Done reading to Messages");
+                Console.WriteLine("Done reading Messages");
+                for (int i = 0; i < messages.Count; i++)
+                {
+                    Console.WriteLine(messages[i].Message);
+                }
                 return messages;
             }
         }

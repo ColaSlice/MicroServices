@@ -7,7 +7,7 @@ namespace MicroServiceProxy.LoginProxy
     {
         public ValueTask<HttpResponseMessage> Register(UserDto userDto);
         public ValueTask<HttpResponseMessage> Login(UserDto userDto);
-        public ValueTask<HttpResponseMessage> ValidateUser(MessageDto messageDto);
+        public Task<HttpResponseMessage> ValidateUser(MessageDto messageDto);
         public ValueTask<bool> GetStatus();
     }
 }

@@ -30,9 +30,9 @@ namespace DatabaseService.Controllers
         
         // GET: api/Database/getmessages
         [HttpGet("getmessages")]
-        public List<MessageDto> GetMessages(string toUser, string user)
+        public List<MessageDto> GetMessages(string toUser)
         {
-            return _databaseHandler.ReadMessage(null, toUser, user);
+            return _databaseHandler.ReadMessage(null, toUser);
         }
 
         // POST: api/Database/savelog

@@ -78,9 +78,17 @@ namespace MicroServiceProxy.Controllers
         }
 
         [HttpPost("validateuser")]
-        public async Task<ActionResult> ValidateUser(UserDto userDto)
+        public async Task<ActionResult> ValidateUser(MessageDto messageDto)
         {
-            return Problem("Not implemented yet");
+            var response = await _loginProxyHandler.ValidateUser(messageDto);
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                response.Dispose();
+                return Problem("Internal problem occured");
+            }
+
+            return Ok();
         }
     }
 }

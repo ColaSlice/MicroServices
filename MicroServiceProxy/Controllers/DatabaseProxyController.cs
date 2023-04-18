@@ -11,7 +11,7 @@ namespace MicroServiceProxy.Controllers;
 //ApiController needs to come before the route. Oh, and these [ApiController] is called a decorator, I think.
 [ApiController]
 [Route("api/[controller]")]
-public class DatabaseProxyConstroller : ControllerBase
+public class DatabaseProxyController : ControllerBase
 {
     private static User _user = new User();
     private Tokens _tokens;
@@ -20,7 +20,7 @@ public class DatabaseProxyConstroller : ControllerBase
     private IDatabaseProxyHandler _databaseProxyHandler;
     private List<string> _services;
         
-    public DatabaseProxyConstroller(ILoginProxyHandler loginProxyHandler, IMessageProxyHandler messageProxyHandler, IDatabaseProxyHandler databaseProxyHandler)
+    public DatabaseProxyController(ILoginProxyHandler loginProxyHandler, IMessageProxyHandler messageProxyHandler, IDatabaseProxyHandler databaseProxyHandler)
     {
         _tokens = new Tokens();
         _loginProxyHandler = loginProxyHandler;
@@ -30,9 +30,9 @@ public class DatabaseProxyConstroller : ControllerBase
     }
     
     [HttpGet("getmessages")]
-    public async Task<ActionResult<List<MessageDto>>> GetMessages(string toUser, string user)
+    public async Task<ActionResult<List<MessageDto>>> GetMessages(string toUser)
     {
-        var response = await _databaseProxyHandler.GetMessages(toUser, user);
+        var response = await _databaseProxyHandler.GetMessages(toUser);
         if (response.StatusCode != HttpStatusCode.OK)
         {
             response.Dispose();
@@ -44,9 +44,11 @@ public class DatabaseProxyConstroller : ControllerBase
     [HttpPost("savemessage")]
     public async Task<ActionResult> SaveMessage(MessageDto messageDto)
     {
+        Console.WriteLine(messageDto.Message);
         var response = await _databaseProxyHandler.SaveMessage(messageDto);
         if (response.StatusCode != HttpStatusCode.OK)
         {
+            Console.WriteLine(response.StatusCode);
             response.Dispose();
             return NotFound();
         }

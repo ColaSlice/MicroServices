@@ -5,8 +5,10 @@ namespace MessageService.Message;
 
 public class MessageHandler : IMessageHandler
 {
-    private const string SendProxyMessageUrl = @"http://localhost:5002/api/Proxy/savemessage";
-    private string GetProxyMessageUrl = @"http://localhost:5002/api/DatabaseProxyConstroller/getmessages?";
+    // localhost:5002
+    // proxy-service
+    private const string SendProxyMessageUrl = @"http://proxy-service:5002/api/DatabaseProxy/savemessage";
+    private string GetProxyMessageUrl = @"http://proxy-service:5002/api/DatabaseProxy/getmessages?";
     // Do not do this in production vvv https://stackoverflow.com/questions/52939211/the-ssl-connection-could-not-be-established
     private readonly HttpClientHandler _clientHandler = new HttpClientHandler();
     private readonly HttpClient _client;
@@ -18,6 +20,7 @@ public class MessageHandler : IMessageHandler
     }
     public async Task<HttpResponseMessage> SendMessage(MessageDto messageDto)
     {
+        Console.WriteLine(messageDto.Message);
         HttpResponseMessage response;
         try
         {
@@ -28,12 +31,13 @@ public class MessageHandler : IMessageHandler
             Console.WriteLine(e);
             throw;
         }
+        Console.WriteLine(response.StatusCode);
         return response;
     }
 
-    public async Task<HttpResponseMessage> GetMessage(string toUser, string user)
+    public async Task<HttpResponseMessage> GetMessage(string toUser)
     {
-        GetProxyMessageUrl += $"toUser={toUser}&user={user}";
+        GetProxyMessageUrl += $"toUser={toUser}";
         HttpResponseMessage response;
         try
         {

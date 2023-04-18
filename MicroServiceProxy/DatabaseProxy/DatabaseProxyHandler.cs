@@ -13,11 +13,11 @@ public class DatabaseProxyHandler : IDatabaseProxyHandler
     
     // database-service:5004
     // localhost:5004
-    private const string _getLogsUrl = @"http://localhost:5004/api/Database/getlogs";
-    private string _getMessageUrl = @"http://localhost:5004/api/Database/getmessages?";
-    private const string _saveLogUrl = @"http://localhost:5004/api/Database/savelog";
-    private const string _saveMessage = @"http://localhost:5004/api/Database/savemessage";
-    private const string ServiceStatusUrl = @"http://localhost:5004/api/Database/status";
+    private const string _getLogsUrl = @"http://database-service:5004/api/Database/getlogs";
+    private string _getMessageUrl = @"http://database-service:5004/api/Database/getmessages?";
+    private const string _saveLogUrl = @"http://database-service:5004/api/Database/savelog";
+    private const string _saveMessage = @"http://database-service:5004/api/Database/savemessage";
+    private const string ServiceStatusUrl = @"http://database-service:5004/api/Database/status";
 
     public DatabaseProxyHandler(ILoggerHandler loggerHandler)
     {
@@ -49,12 +49,11 @@ public class DatabaseProxyHandler : IDatabaseProxyHandler
         return response;
     }
 
-    public async Task<HttpResponseMessage> GetMessages(string toUser, string user)
+    public async Task<HttpResponseMessage> GetMessages(string toUser)
     {
         _client.DefaultRequestHeaders.Add("XApiKey", "pgH7QzFHJx4w46fI~5Uzi4RvtTwlEXp");
-        string temp = $"toUser={toUser}&user={user}";
+        string temp = $"toUser={toUser}";
         _getMessageUrl += temp;
-        Console.WriteLine(_getMessageUrl);
         HttpResponseMessage response;
         try
         {
@@ -63,12 +62,10 @@ public class DatabaseProxyHandler : IDatabaseProxyHandler
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
             //_loggerHandler.Log($"Exception: {e}");
             _client.Dispose();
             throw;
         }
-
         return response;
     }
 
@@ -93,6 +90,7 @@ public class DatabaseProxyHandler : IDatabaseProxyHandler
 
     public async Task<HttpResponseMessage> SaveMessage(MessageDto messageDto)
     {
+        Console.WriteLine(messageDto.Message);
         _client.DefaultRequestHeaders.Add("XApiKey", "pgH7QzFHJx4w46fI~5Uzi4RvtTwlEXp");
         HttpResponseMessage response;
         try

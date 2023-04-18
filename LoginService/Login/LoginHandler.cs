@@ -74,12 +74,13 @@ public class LoginHandler : ILoginHandler
     
     public bool ValidateUser(MessageDto messageDto)
     {
-        if (_databaseHandler.UsernameExists(messageDto))
+        if (!_databaseHandler.UsernameExists(messageDto))
         {
-            return true;
+            Console.WriteLine("Not validated");
+            return false;
         }
-
-        return false;
+        Console.WriteLine("Validated");
+        return true;
     }
     
     public string CreateToken(User user)
