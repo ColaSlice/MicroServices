@@ -1,6 +1,6 @@
 namespace LoginService.Models;
 
-public class Tokens
+public record Tokens
 {
     public string Token { get; set; } = string.Empty;
 

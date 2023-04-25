@@ -1,6 +1,6 @@
 namespace LoginService.Models;
 
-public class UserDto : IDisposable
+public record UserDto : IDisposable
 {
     public required string Username { get; set; }
     public required string Password { get; set; }

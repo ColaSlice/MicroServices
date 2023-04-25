@@ -40,22 +40,19 @@ namespace LoginService.Controllers
         {
             // TODO better login checking. You can login with any username and password, as long as the Email is the same.
             _user = _loginHandler.Login(request);
-            if (_user.Email == "")
+            if (_user.Email != "")
             {
-                _user.Dispose();
-                return NotFound("User doesn't exist");
+                _tokens.Token = _loginHandler.CreateToken(_user);
+                return Ok(_tokens);
             }
-
-            _tokens.Token = _loginHandler.CreateToken(_user);
-            
-            return Ok(_tokens);
+            _user.Dispose();
+            return NotFound("User doesn't exist");
         }
         
         [HttpPost("validateuser")]
-        public ActionResult<Tokens> ValidateUser(MessageDto messageDto)
+        public async Task<ActionResult<Tokens>> ValidateUser(MessageDto messageDto)
         {
-            _usernameExists = _loginHandler.ValidateUser(messageDto);
-            if (!_usernameExists)
+            if (!await _loginHandler.ValidateUser(messageDto))
             {
                 return NotFound("User doesn't exist");
             }

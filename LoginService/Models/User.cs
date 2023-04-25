@@ -1,6 +1,6 @@
 namespace LoginService.Models;
 
-public class User : IDisposable
+public record User : IDisposable
 {
     public string Username { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;

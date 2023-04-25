@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using LoginService.Database;
 using LoginService.Models;
 using LoginService.Services;
@@ -13,8 +14,10 @@ public class LoginHandler : ILoginHandler
     private readonly IConfiguration _configuration;
     private ILoggerHandler _loggerHandler;
     private static User _user;
+    //private Stopwatch _stopwatch;
     public LoginHandler(IConfiguration configuration, ILoginDatabaseHandler databaseHandler, ILoggerHandler loggerHandler)
     {
+        //_stopwatch = new Stopwatch();
         _configuration = configuration;
         _databaseHandler = databaseHandler;
         _loggerHandler = loggerHandler;
@@ -23,15 +26,15 @@ public class LoginHandler : ILoginHandler
 
     public async Task<User> Register(UserDto request)
     {
-        string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
-        request.Password = "";
+        Task<bool> userExists = _databaseHandler.UserExists(request.Email, null);
         _user.Username = request.Username;
-        _user.PasswordHash = passwordHash;
+        request.Password = "";
         _user.Email = request.Email;
         _user.License = request.License;
 
-        if (!await _databaseHandler.UserExists(_user))
+        if (!userExists.GetAwaiter().GetResult())
         {
+            _user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
             await _databaseHandler.SaveUser(_user);
             return _user;
         }
@@ -43,23 +46,28 @@ public class LoginHandler : ILoginHandler
 
     public User Login(UserDto request)
     {
-        if (_databaseHandler.ReadUser(request).Email != request.Email)
+        Task<bool> isVeryfied = Verify(request.Password, _databaseHandler.ReadUser(request).PasswordHash);
+        User checkUser = _databaseHandler.ReadUser(request);
+        if (checkUser.Email != request.Email)
         {
-            _loggerHandler.Log("Error, email is not recognised");
+            //_loggerHandler.Log("Error, email is not recognised");
             _user.Dispose();
+            _databaseHandler.Dispose();
             return _user;
         }
 
-        if (_databaseHandler.ReadUser(request).Username != request.Username)
+        if (checkUser.Username != request.Username)
         {
-            _loggerHandler.Log("Error, username is not recognised");
+            //_loggerHandler.Log("Error, username is not recognised");
             _user.Dispose();
+            _databaseHandler.Dispose();
             return _user;
         }
 
-        if (!BCrypt.Net.BCrypt.Verify(request.Password, _databaseHandler.ReadUser(request).PasswordHash))
+        if (!isVeryfied.GetAwaiter().GetResult())
         {
             _user.Dispose();
+            _databaseHandler.Dispose();
             return _user;
         }
 
@@ -71,16 +79,15 @@ public class LoginHandler : ILoginHandler
         
         return _user;
     }
-    
-    public bool ValidateUser(MessageDto messageDto)
+
+    private async Task<bool> Verify(string password, string passwordHash)
     {
-        if (!_databaseHandler.UsernameExists(messageDto))
-        {
-            Console.WriteLine("Not validated");
-            return false;
-        }
-        Console.WriteLine("Validated");
-        return true;
+        return BCrypt.Net.BCrypt.Verify(password, passwordHash);
+    }
+    
+    public async Task<bool> ValidateUser(MessageDto messageDto)
+    {
+        return await _databaseHandler.UserExists(null, messageDto.User);
     }
     
     public string CreateToken(User user)
