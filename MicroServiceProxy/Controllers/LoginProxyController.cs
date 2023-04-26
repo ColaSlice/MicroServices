@@ -30,7 +30,7 @@ namespace MicroServiceProxy.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<User>> RegisterUser(UserDto userDto)
+        public async Task<ActionResult> RegisterUser(UserDto userDto)
         {
             var response = await _loginProxyHandler.Register(userDto);
             
@@ -48,13 +48,13 @@ namespace MicroServiceProxy.Controllers
                 return Problem("Internal problem occured");
             }
             
-            _user = (await response.Content.ReadFromJsonAsync<User>())!;
+            //_user = (await response.Content.ReadFromJsonAsync<User>())!;
             response.Dispose();
-            return Ok(_user);
+            return Ok();
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<User>> Login(UserDto userDto)
+        public async Task<ActionResult<Tokens>> Login(UserDto userDto)
         {
             var response = await _loginProxyHandler.Login(userDto);
             

@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using LoginService.Database;
 using LoginService.Models;
 using LoginService.Services;
@@ -6,68 +5,55 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LoginService.Login;
 public class LoginHandler : ILoginHandler
 {
-    private ILoginDatabaseHandler _databaseHandler;
+    private readonly ILoginDatabaseHandler _databaseHandler;
     private readonly IConfiguration _configuration;
-    private ILoggerHandler _loggerHandler;
-    private static User _user;
-    //private Stopwatch _stopwatch;
+    private readonly ILoggerHandler _loggerHandler;
+    private readonly User _user;
     public LoginHandler(IConfiguration configuration, ILoginDatabaseHandler databaseHandler, ILoggerHandler loggerHandler)
     {
-        //_stopwatch = new Stopwatch();
         _configuration = configuration;
         _databaseHandler = databaseHandler;
         _loggerHandler = loggerHandler;
         _user = new User();
     }
 
-    public async Task<User> Register(UserDto request)
+    public async Task<User?> Register(UserDto request)
     {
-        Task<bool> userExists = _databaseHandler.UserExists(request.Email, null);
-        _user.Username = request.Username;
+        string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
         request.Password = "";
+        _user.Username = request.Username;
+        _user.PasswordHash = passwordHash;
         _user.Email = request.Email;
         _user.License = request.License;
 
-        if (!userExists.GetAwaiter().GetResult())
+        if (!await _databaseHandler.UserExists(_user.Email))
         {
-            _user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
             await _databaseHandler.SaveUser(_user);
             return _user;
         }
         
-        _user.Dispose();
         _databaseHandler.Dispose();
-        return _user;
+        _user.Dispose();
+        return null;
     }
 
-    public User Login(UserDto request)
+    public async Task<User> Login(UserDto request)
     {
-        Task<bool> isVeryfied = Verify(request.Password, _databaseHandler.ReadUser(request).PasswordHash);
-        User checkUser = _databaseHandler.ReadUser(request);
-        if (checkUser.Email != request.Email)
+        if (!await _databaseHandler.UserExists(request.Email))
         {
-            //_loggerHandler.Log("Error, email is not recognised");
             _user.Dispose();
-            _databaseHandler.Dispose();
             return _user;
         }
 
-        if (checkUser.Username != request.Username)
-        {
-            //_loggerHandler.Log("Error, username is not recognised");
-            _user.Dispose();
-            _databaseHandler.Dispose();
-            return _user;
-        }
-
-        if (!isVeryfied.GetAwaiter().GetResult())
+        if (!BCrypt.Net.BCrypt.Verify(request.Password, _databaseHandler.ReadUser(request).PasswordHash))
         {
             _user.Dispose();
-            _databaseHandler.Dispose();
             return _user;
         }
 
@@ -79,15 +65,16 @@ public class LoginHandler : ILoginHandler
         
         return _user;
     }
-
-    private async Task<bool> Verify(string password, string passwordHash)
-    {
-        return BCrypt.Net.BCrypt.Verify(password, passwordHash);
-    }
     
     public async Task<bool> ValidateUser(MessageDto messageDto)
     {
-        return await _databaseHandler.UserExists(null, messageDto.User);
+        if (!await _databaseHandler.UserExists(messageDto.Email))
+        {
+            Console.WriteLine("Not validated");
+            return false;
+        }
+        Console.WriteLine("Validated");
+        return true;
     }
     
     public string CreateToken(User user)
@@ -111,6 +98,4 @@ public class LoginHandler : ILoginHandler
 
         return jwt;
     }
-
-    
 }
