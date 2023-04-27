@@ -90,7 +90,6 @@ public class DatabaseProxyHandler : IDatabaseProxyHandler
 
     public async Task<HttpResponseMessage> SaveMessage(MessageDto messageDto)
     {
-        Console.WriteLine(messageDto.Message);
         _client.DefaultRequestHeaders.Add("XApiKey", "pgH7QzFHJx4w46fI~5Uzi4RvtTwlEXp");
         HttpResponseMessage response;
         try
@@ -100,7 +99,6 @@ public class DatabaseProxyHandler : IDatabaseProxyHandler
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
             //_loggerHandler.Log($"Exception: {e}");
             _client.Dispose();
             throw;

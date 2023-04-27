@@ -12,6 +12,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IDatabaseHandler, DatabaseHandler>();
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

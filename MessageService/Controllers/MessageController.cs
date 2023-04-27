@@ -17,7 +17,6 @@ namespace MessageService.Controllers
         [HttpPost("sendmessage")]
         public async Task<ActionResult<MessageDto>> SendMessage(MessageDto messageDto)
         {
-            Console.WriteLine(messageDto.Message);
             var response = await _messageHandler.SendMessage(messageDto);
             return Ok(response);
         }

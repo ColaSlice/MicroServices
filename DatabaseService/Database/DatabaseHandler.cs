@@ -8,64 +8,58 @@ namespace DatabaseService.Database
     public class DatabaseHandler : IDatabaseHandler
     {
         private LiteDatabase _liteDatabase;
-        private const string _messages = @"Messages.db";
-        private const string _logs = @"Logs.db";
-        private const string _messagesCollection = @"messages";
-        private const string _logsCollection = @"logs";
-        
+        private const string Messages = @"Messages.db";
+        private const string Logs = @"Logs.db";
+        private const string MessagesCollection = @"messages";
+        private const string LogsCollection = @"logs";
+
         public void Save(Enum type, MessageDto? messageDto, LogMessage? logMessage)
         {
             if (Equals(type, (Enum)Types.Log))
             {
-                using (var _liteDatabase = new LiteDatabase(_logs))
+                using (var liteDatabase = new LiteDatabase(Logs))
                 {
-                    var collection = _liteDatabase.GetCollection<LogMessage>(_logsCollection);
+                    var collection = liteDatabase.GetCollection<LogMessage>(LogsCollection);
 
                     collection.Insert(logMessage);
 
                     collection.EnsureIndex(x => x.Timestamp);
-                    
-                    Console.WriteLine("Done writing to Logs");
                 }
             }
 
             if (Equals(type, (Enum)Types.Message))
             {
-                using (var _liteDatabase = new LiteDatabase(_messages))
+                using (var liteDatabase = new LiteDatabase(Messages))
                 {
-                    var collection = _liteDatabase.GetCollection<MessageDto>(_messagesCollection);
+                    var collection = liteDatabase.GetCollection<MessageDto>(MessagesCollection);
 
                     collection.Insert(messageDto);
 
                     collection.EnsureIndex(x => x.Timestamp);
-                    
-                    Console.WriteLine("Done writing to Messages");
                 }
             }
         }
 
         public List<LogMessage> ReadLogs(DateTime? timeStamp)
         { 
-            using (var _liteDatabase = new LiteDatabase(_logs))
+            using (var liteDatabase = new LiteDatabase(Logs))
             {
-                var collection = _liteDatabase.GetCollection<LogMessage>(_logsCollection);
+                var collection = liteDatabase.GetCollection<LogMessage>(LogsCollection);
 
                 var logs = collection.Query().ToList();
-                Console.WriteLine("Done reading Logs");
                 return logs;
             }
         }
 
         public List<MessageDto> ReadMessage(DateTime? timeStamp, string toUser)
         {
-            using (var _liteDatabase = new LiteDatabase(_messages))
+            using (var liteDatabase = new LiteDatabase(Messages))
             {
-                var collection = _liteDatabase.GetCollection<MessageDto>(_messagesCollection);
+                var collection = liteDatabase.GetCollection<MessageDto>(MessagesCollection);
 
                 var messages = collection.Query()
                     .Where(x => x.ToUser == toUser)
                     .ToList();
-                Console.WriteLine("Done reading Messages");
                 for (int i = 0; i < messages.Count; i++)
                 {
                     Console.WriteLine(messages[i].Message);
