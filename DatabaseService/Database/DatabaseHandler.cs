@@ -13,15 +13,15 @@ namespace DatabaseService.Database
         private const string MessagesCollection = @"messages";
         private const string LogsCollection = @"logs";
 
-        public void Save(Enum type, MessageDto? messageDto, LogMessage? logMessage)
+        public void Save(Enum type, MessageDto? messageDto, LogDto? logDto)
         {
             if (Equals(type, (Enum)Types.Log))
             {
                 using (var liteDatabase = new LiteDatabase(Logs))
                 {
-                    var collection = liteDatabase.GetCollection<LogMessage>(LogsCollection);
+                    var collection = liteDatabase.GetCollection<LogDto>(LogsCollection);
 
-                    collection.Insert(logMessage);
+                    collection.Insert(logDto!);
 
                     collection.EnsureIndex(x => x.Timestamp);
                 }
@@ -33,18 +33,18 @@ namespace DatabaseService.Database
                 {
                     var collection = liteDatabase.GetCollection<MessageDto>(MessagesCollection);
 
-                    collection.Insert(messageDto);
+                    collection.Insert(messageDto!);
 
                     collection.EnsureIndex(x => x.Timestamp);
                 }
             }
         }
 
-        public List<LogMessage> ReadLogs(DateTime? timeStamp)
-        { 
+        public List<LogDto> ReadLogs(DateTime? timeStamp)
+        {
             using (var liteDatabase = new LiteDatabase(Logs))
             {
-                var collection = liteDatabase.GetCollection<LogMessage>(LogsCollection);
+                var collection = liteDatabase.GetCollection<LogDto>(LogsCollection);
 
                 var logs = collection.Query().ToList();
                 return logs;
@@ -60,10 +60,7 @@ namespace DatabaseService.Database
                 var messages = collection.Query()
                     .Where(x => x.ToUser == toUser)
                     .ToList();
-                for (int i = 0; i < messages.Count; i++)
-                {
-                    Console.WriteLine(messages[i].Message);
-                }
+                
                 return messages;
             }
         }

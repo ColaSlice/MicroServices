@@ -10,6 +10,8 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.11" />
+        <PackageReference Include="prometheus-net" Version="8.0.0" />
+        <PackageReference Include="prometheus-net.AspNetCore" Version="8.0.0" />
         <PackageReference Include="RabbitMQ.Client" Version="6.4.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     </ItemGroup>

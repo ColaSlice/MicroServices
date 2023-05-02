@@ -3,6 +3,7 @@ using MicroServiceProxy.LoginProxy;
 using MicroServiceProxy.MessageProxy;
 using MicroServiceProxy.Services;
 using Microsoft.AspNetCore.HttpOverrides;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 const string myAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -29,7 +30,7 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-
+app.UseMetricServer();
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
@@ -44,7 +45,6 @@ if (app.Environment.IsDevelopment())
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseHttpsRedirection();
     app.UseHttpsRedirection();
 }
 

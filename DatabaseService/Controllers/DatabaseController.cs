@@ -23,7 +23,7 @@ namespace DatabaseService.Controllers
 
         // GET: api/Database/getlogs
         [HttpGet("getlogs")]
-        public List<LogMessage> GetLogs()
+        public List<LogDto> GetLogs()
         {
             return _databaseHandler.ReadLogs(null);
         }
@@ -37,9 +37,9 @@ namespace DatabaseService.Controllers
 
         // POST: api/Database/savelog
         [HttpPost("savelog")]
-        public async Task<ActionResult> SaveLog(LogMessage logMessage)
+        public async Task<ActionResult> SaveLog(LogDto logDto)
         {
-            _databaseHandler.Save(Types.Log, null, logMessage);
+            _databaseHandler.Save(Types.Log, null, logDto);
             return Ok();
         }
         

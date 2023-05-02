@@ -14,7 +14,7 @@ public class LoginHandler : ILoginHandler
     private readonly ILoginDatabaseHandler _databaseHandler;
     private readonly IConfiguration _configuration;
     private readonly ILoggerHandler _loggerHandler;
-    private readonly User _user;
+    private User _user;
     public LoginHandler(IConfiguration configuration, ILoginDatabaseHandler databaseHandler, ILoggerHandler loggerHandler)
     {
         _configuration = configuration;
@@ -57,12 +57,9 @@ public class LoginHandler : ILoginHandler
             return _user;
         }
 
-        _user.Username = request.Username;
-        _user.PasswordHash = _databaseHandler.ReadUser(request).PasswordHash;
-        _user.Email = request.Email;
-        _user.License = request.License;
-        _databaseHandler.Dispose();
-        
+        _user = _databaseHandler.ReadUser(request);
+        Console.WriteLine(_user.Email);
+
         return _user;
     }
     
@@ -80,7 +77,9 @@ public class LoginHandler : ILoginHandler
     public string CreateToken(User user)
     {
         List<Claim> claims = new List<Claim> {
-            new Claim(ClaimTypes.Name, user.Username)
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.UserData, user.License)
         };
 
         SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
