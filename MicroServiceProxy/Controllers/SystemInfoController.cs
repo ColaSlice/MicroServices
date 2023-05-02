@@ -8,6 +8,7 @@ using MicroServiceProxy.MessageProxy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Prometheus;
 
 namespace MicroServiceProxy.Controllers
 {
@@ -20,7 +21,7 @@ namespace MicroServiceProxy.Controllers
         private IDatabaseProxyHandler _databaseProxyHandler;
         private List<string> _services;
         private List<string> _endpoints;
-        
+
         public SystemInfoController(ILoginProxyHandler loginProxyHandler, IMessageProxyHandler messageProxyHandler, IDatabaseProxyHandler databaseProxyHandler)
         {
             _loginProxyHandler = loginProxyHandler;
@@ -50,7 +51,7 @@ namespace MicroServiceProxy.Controllers
             
             return Ok(_endpoints);
         }
-
+        
         [HttpGet("getstatus")]
         public async Task<ActionResult<List<string>>> GetStatus()
         {
