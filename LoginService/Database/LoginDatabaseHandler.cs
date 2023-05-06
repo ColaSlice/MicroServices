@@ -10,6 +10,7 @@ namespace LoginService.Database
         private SqliteConnection _connection;
         //private SqliteConnection _connection;
         private static User _user;
+        private static object MyLock = new object();
 
         public LoginDatabaseHandler()
         {
@@ -25,14 +26,17 @@ namespace LoginService.Database
 
         public async ValueTask SaveUser(User user)
         {
-            using (SqliteCommand _cmd = new SqliteCommand("INSERT INTO login (username, passwordhash, email, license) VALUES (@username, @passwordhash, @email, @license)", _connection))
+            lock (MyLock)
             {
-                _cmd.Parameters.AddWithValue("@username", user.Username);
-                _cmd.Parameters.AddWithValue("@passwordhash", user.PasswordHash);
-                _cmd.Parameters.AddWithValue("@email", user.Email);
-                _cmd.Parameters.AddWithValue("@license", user.License);
-                _cmd.Prepare();
-                _cmd.ExecuteNonQuery();
+                using (SqliteCommand _cmd = new SqliteCommand("INSERT INTO login (username, passwordhash, email, license) VALUES (@username, @passwordhash, @email, @license)", _connection))
+                {
+                    _cmd.Parameters.AddWithValue("@username", user.Username);
+                    _cmd.Parameters.AddWithValue("@passwordhash", user.PasswordHash);
+                    _cmd.Parameters.AddWithValue("@email", user.Email);
+                    _cmd.Parameters.AddWithValue("@license", user.License);
+                    _cmd.Prepare();
+                    _cmd.ExecuteNonQuery();
+                }
             }
         }
 
