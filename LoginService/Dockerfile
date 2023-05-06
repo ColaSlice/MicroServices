@@ -10,6 +10,6 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0
 ENV DOTNET_URLS=http://+:5001
 WORKDIR /app
 COPY --from=build /app ./
-EXPOSE 5000
+EXPOSE 5001
 
 ENTRYPOINT ["dotnet", "LoginService.dll"]

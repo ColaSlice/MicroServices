@@ -11,9 +11,6 @@ ENV DOTNET_URLS=http://+:5002
 WORKDIR /app
 COPY --from=build /app ./
 
-EXPOSE 5000
-EXPOSE 5001
-EXPOSE 80
-EXPOSE 443
+EXPOSE 5002
 
 ENTRYPOINT ["dotnet", "MicroServiceProxy.dll"]

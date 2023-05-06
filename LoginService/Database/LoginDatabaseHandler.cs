@@ -3,50 +3,57 @@ using LoginService.Models;
 
 namespace LoginService.Database
 {
-    public class LoginDatabaseHandler : ILoginDatabaseHandler
+    public class LoginDatabaseHandler : ILoginDatabaseHandler, IDisposable
     {
         private const string DataSourceString = @"Data Source=TestLoginDatabase";
-        private readonly SqliteConnection _connection;
-        private User _user;
+
+        private SqliteConnection _connection;
+        //private SqliteConnection _connection;
+        private static User _user;
+        private static object MyLock = new object();
 
         public LoginDatabaseHandler()
         {
             _user = new User();
             _connection = new SqliteConnection(DataSourceString);
             _connection.Open();
-            SqliteCommand _cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS Login (id INTEGER NOT NULL UNIQUE, username	TEXT NOT NULL, passwordhash	TEXT NOT NULL, email TEXT NOT NULL, license	TEXT NOT NULL, PRIMARY KEY(id AUTOINCREMENT));", _connection);
-            _cmd.Prepare();
-            _cmd.ExecuteNonQuery();
-        }
-
-        public void SaveUser(User user)
-        {
-            using (SqliteCommand _cmd = new SqliteCommand("INSERT INTO login (username, passwordhash, email, license) VALUES (@username, @passwordhash, @email, @license)", _connection))
+            using (SqliteCommand _cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS Login (id INTEGER NOT NULL UNIQUE, username TEXT NOT NULL, passwordhash TEXT NOT NULL, email TEXT NOT NULL, license TEXT NOT NULL, PRIMARY KEY(id AUTOINCREMENT));", _connection)) 
             {
-                _cmd.Parameters.AddWithValue("@username", user.Username);
-                _cmd.Parameters.AddWithValue("@passwordhash", user.PasswordHash);
-                _cmd.Parameters.AddWithValue("@email", user.Email);
-                _cmd.Parameters.AddWithValue("@license", user.License);
                 _cmd.Prepare();
-                _cmd.ExecuteNonQuery();
-                _connection.Close();
-                _connection.Dispose();
+                _cmd.ExecuteNonQuery(); 
             }
         }
 
-        public bool UserExists(User user)
+        public async ValueTask SaveUser(User user)
+        {
+            lock (MyLock)
+            {
+                using (SqliteCommand _cmd = new SqliteCommand("INSERT INTO login (username, passwordhash, email, license) VALUES (@username, @passwordhash, @email, @license)", _connection))
+                {
+                    _cmd.Parameters.AddWithValue("@username", user.Username);
+                    _cmd.Parameters.AddWithValue("@passwordhash", user.PasswordHash);
+                    _cmd.Parameters.AddWithValue("@email", user.Email);
+                    _cmd.Parameters.AddWithValue("@license", user.License);
+                    _cmd.Prepare();
+                    _cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public async Task<bool> UserExists(string email)
         {
             using (SqliteCommand _cmd = new SqliteCommand("SELECT email FROM login WHERE email=@email", _connection))
             {
-                _cmd.Parameters.AddWithValue("@email", user.Email);
+                _cmd.Parameters.AddWithValue("@email", email);
                 using (SqliteDataReader reader = _cmd.ExecuteReader())
                 {
-                    if (reader.HasRows)
+                    while (reader.Read())
                     {
-                        _connection.Close();
-                        _connection.Dispose();
-                        _cmd.Dispose();
-                        return true;
+                        if (reader.HasRows)
+                        {
+                            _cmd.Dispose();
+                            return true;
+                        }
                     }
                 }
             }
@@ -62,16 +69,24 @@ namespace LoginService.Database
                 {
                     while (reader.Read())
                     {
-                        Console.WriteLine($"{reader.GetInt32(0)} {reader["email"]}");
+                        //Console.WriteLine($"{reader.GetInt32(0)} {reader["email"]}");
                         _user.Username = reader["username"].ToString()!;
                         _user.PasswordHash = reader["passwordhash"].ToString()!;
                         _user.Email = reader["email"].ToString()!;
                         _user.License = reader["license"].ToString()!;
                     }
                 }
+
                 _cmd.Dispose();
                 return _user;
             }
+        }
+
+        public void Dispose()
+        {
+            _connection.Close();
+            _connection.Dispose();
+            _user.Dispose();
         }
     }
 }

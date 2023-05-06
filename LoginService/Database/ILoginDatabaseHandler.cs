@@ -4,9 +4,9 @@ namespace LoginService.Database
 {
     public interface ILoginDatabaseHandler
     {
-        public void SaveUser(User user);
-        public bool UserExists(User user);
+        public ValueTask SaveUser(User user);
+        public Task<bool> UserExists(string email);
         public User ReadUser(UserDto request);
-
+        public void Dispose();
     }
 }

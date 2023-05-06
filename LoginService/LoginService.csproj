@@ -5,10 +5,12 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <LangVersion>11</LangVersion>
+        <ServerGarbageCollection>false</ServerGarbageCollection>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+        <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0-beta3" />
         <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.2" />
         <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.26.1" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.11" />

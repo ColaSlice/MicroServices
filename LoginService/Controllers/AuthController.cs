@@ -9,8 +9,9 @@ namespace LoginService.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private User _user;
-        private Tokens _tokens;
+        private User? _user;
+        private bool _usernameExists;
+        private static Tokens _tokens;
         private ILoginHandler _loginHandler;
 
         public AuthController(ILoginHandler loginHandler)
@@ -21,28 +22,26 @@ namespace LoginService.Controllers
         }
 
         [HttpPost("register")]
-        public ActionResult<User> RegisterUser(UserDto request)
+        public async Task<ActionResult> RegisterUser(UserDto request)
         {
-            _user = _loginHandler.Register(request);
+            _user = await _loginHandler.Register(request);
 
-            if (_user.Username == "")
+            if (_user == null)
             {
-                _user.Dispose();
-                return BadRequest(_user);
+                return BadRequest("User Already Exists");
             }
             
-            return Ok(_user);
+            return Ok();
         }
         
         [HttpPost("login")]
-        public ActionResult<Tokens> Login(UserDto request)
+        public async Task<ActionResult<Tokens>> Login(UserDto request)
         {
             // TODO better login checking. You can login with any username and password, as long as the Email is the same.
-            _user = _loginHandler.Login(request);
+            _user = await _loginHandler.Login(request);
             if (_user.Email == "")
             {
-                _user.Dispose();
-                return NotFound("User doesn't exist");
+                return NotFound("User not found");
             }
 
             _tokens.Token = _loginHandler.CreateToken(_user);
@@ -50,10 +49,22 @@ namespace LoginService.Controllers
             return Ok(_tokens);
         }
         
-        [HttpGet]
-        public ActionResult Get()
+        [HttpPost("validateuser")]
+        public async Task<ActionResult> ValidateUser(MessageDto messageDto)
         {
-            return Ok("1.0.0");
+            _usernameExists = await _loginHandler.ValidateUser(messageDto);
+            if (!_usernameExists)
+            {
+                return NotFound("User doesn't exist");
+            }
+
+            return Ok("Validated");
+        }
+        
+        [HttpGet("status")]
+        public ActionResult<bool> GetStatus()
+        {
+            return Ok("Running");
         }
     }
 }
