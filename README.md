@@ -19,6 +19,7 @@ An example of a Systemd service:
 ```sh
 # This example doesn't have a volume attached. Only thing it does, is running the service.
 # As long as the service is enabled by Systemd, it should start itself after a host restart.
+# This example also doesn't take into account how to stop the service, so that is recommended to be done via a Docker command.
 [Unit]
 Description=Login service
 
