@@ -16,7 +16,7 @@ To run the microservice, run:
 Or for most ease of use, you can just create a Systemd service (or any other init system service. Just make sure dotnet and aspnet runtime is supported).
 An example of a Systemd service:
 
-```
+```sh
 [Unit]
 Description=Login service
 
