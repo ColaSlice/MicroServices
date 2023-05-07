@@ -17,7 +17,8 @@ Or for most ease of use, you can just create a Systemd service (or any other ini
 An example of a Systemd service:
 
 ```sh
-# This example doesn't have a volume attached. Only thing it does, is running the service. As long as the service is enabled by Systemd, it should start itself after a host restart.
+# This example doesn't have a volume attached. Only thing it does, is running the service.
+# As long as the service is enabled by Systemd, it should start itself after a host restart.
 [Unit]
 Description=Login service
 
