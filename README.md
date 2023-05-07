@@ -13,7 +13,20 @@ To run the microservice, run:
 - docker run --rm --name=message-service --net=data-network -p 5003:5003 prod/messageservice:testing
 - docker run --rm --name=database-service --net=data-network -p 5004:5004 prod/databaseservice:testing
 
-Or, for most ease of use, you can just create a Systemd service (or any other init system service. Just make sure dotnet and aspnet runtime is supported)
+Or for most ease of use, you can just create a Systemd service (or any other init system service. Just make sure dotnet and aspnet runtime is supported).
+An example of a Systemd service:
+
+```
+[Unit]
+Description=Login service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker run --rm --name=login-service --net=data-network -p 5001:5001 prod/loginservice:testing
+
+[Install]
+WantedBy=multi-user.target
+```
 
 (This is an example with the microservice running on the local machine)
 To get a list of endpoints for the proxy service, make a GET request to this URL: 
