@@ -10,9 +10,8 @@ namespace LoginService.Controllers
     public class AuthController : ControllerBase
     {
         private User? _user;
-        private bool _usernameExists;
-        private static Tokens _tokens;
-        private ILoginHandler _loginHandler;
+        private readonly Tokens _tokens;
+        private readonly ILoginHandler _loginHandler;
 
         public AuthController(ILoginHandler loginHandler)
         {
@@ -28,18 +27,18 @@ namespace LoginService.Controllers
 
             if (_user == null)
             {
-                return BadRequest("User Already Exists");
+                return Conflict("Either The User Already Exists Or An Error Occurred");
             }
             
-            return Ok();
+            return Ok("User Registered");
         }
         
         [HttpPost("login")]
         public async Task<ActionResult<Tokens>> Login(UserDto request)
         {
-            // TODO better login checking. You can login with any username and password, as long as the Email is the same.
             _user = await _loginHandler.Login(request);
-            if (_user.Email == "")
+            
+            if (_user == null)
             {
                 return NotFound("User not found");
             }
@@ -52,13 +51,9 @@ namespace LoginService.Controllers
         [HttpPost("validateuser")]
         public async Task<ActionResult> ValidateUser(MessageDto messageDto)
         {
-            _usernameExists = await _loginHandler.ValidateUser(messageDto);
-            if (!_usernameExists)
-            {
-                return NotFound("User doesn't exist");
-            }
-
-            return Ok("Validated");
+            if (await _loginHandler.ValidateUser(messageDto)) return Ok("Validated");
+            
+            return NotFound("User doesn't exist");
         }
         
         [HttpGet("status")]

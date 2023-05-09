@@ -34,11 +34,11 @@ namespace MicroServiceProxy.Controllers
         {
             var response = await _loginProxyHandler.Register(userDto);
             
-            if (response.StatusCode == HttpStatusCode.BadRequest)
+            if (response.StatusCode == HttpStatusCode.Conflict)
             {
                 _user.Dispose();
                 response.Dispose();
-                return BadRequest("User already exist");
+                return BadRequest("Either The User Already Exists Or An Error Occurred");
             }
 
             if (response.StatusCode != HttpStatusCode.OK)
@@ -48,16 +48,15 @@ namespace MicroServiceProxy.Controllers
                 return Problem("Internal problem occured");
             }
             
-            //_user = (await response.Content.ReadFromJsonAsync<User>())!;
             response.Dispose();
-            return Ok();
+            return Ok("User Registered");
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<Tokens>> Login(UserDto userDto)
         {
-            var response = await _loginProxyHandler.Login(userDto);
-            
+            var response = await _loginProxyHandler.Login(userDto)!;
+
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
                 _user.Dispose();
@@ -71,8 +70,9 @@ namespace MicroServiceProxy.Controllers
                 response.Dispose();
                 return Problem("Internal problem occured");
             }
-
+            
             _tokens.Token = await response.Content.ReadAsStringAsync();
+            
             response.Dispose();
             return Ok(_tokens);
         }
@@ -82,13 +82,10 @@ namespace MicroServiceProxy.Controllers
         {
             var response = await _loginProxyHandler.ValidateUser(messageDto);
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                response.Dispose();
-                return Problem("Internal problem occured");
-            }
-
-            return Ok();
+            if (response.StatusCode == HttpStatusCode.OK) return Ok("Validated");
+            
+            response.Dispose();
+            return NotFound("User doesn't exist");
         }
     }
 }

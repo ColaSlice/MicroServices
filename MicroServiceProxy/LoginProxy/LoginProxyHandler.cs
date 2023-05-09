@@ -23,7 +23,6 @@ public class LoginProxyHandler : ILoginProxyHandler
     {
         // Do not do this in production vvv
         _clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
-        // Do not do this in production ^^^
         _client = new HttpClient(_clientHandler);
         _loggerHandler = loggerHandler;
     }
@@ -61,11 +60,11 @@ public class LoginProxyHandler : ILoginProxyHandler
         {
             Console.WriteLine(e);
             //_loggerHandler.Log($"Exception: {e}");
+            userDto.Dispose();
             _client.Dispose();
             throw;
         }
         
-        userDto.Dispose();
         _client.Dispose();
         return response;
     }
@@ -74,15 +73,15 @@ public class LoginProxyHandler : ILoginProxyHandler
     {
         _client.DefaultRequestHeaders.Add("XApiKey", "pgH7QzFHJx4w46fI~5Uzi4RvtTwlEXp");
         var response = await _client.PostAsJsonAsync(ValidateUserUrl, messageDto);
-        if (response.StatusCode != HttpStatusCode.OK)
-        {
-            response.StatusCode = HttpStatusCode.NotFound;
-            return response;
-        }
+        
+        if (response.StatusCode == HttpStatusCode.OK) return response;
+        
+        response.StatusCode = HttpStatusCode.NotFound;
+        
         return response;
     }
 
-    public async ValueTask<bool> GetStatus()
+    public async Task<bool> GetStatus()
     {
         _client.DefaultRequestHeaders.Add("XApiKey", "pgH7QzFHJx4w46fI~5Uzi4RvtTwlEXp");
         HttpResponseMessage response;
@@ -90,16 +89,13 @@ public class LoginProxyHandler : ILoginProxyHandler
         {
             response = await _client.GetAsync(ServiceStatus);
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            Console.WriteLine(e);
             return false;
         }
+
+        if (response.StatusCode == HttpStatusCode.OK) return true;
         
-        if (response.StatusCode != HttpStatusCode.OK)
-        {
-            return false;
-        }
-        return true;
+        return false;
     }
 }
