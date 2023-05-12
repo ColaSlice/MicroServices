@@ -31,47 +31,38 @@ public class LoginHandler : ILoginHandler
         _user.PasswordHash = passwordHash;
         _user.Email = request.Email;
         _user.License = request.License;
-
-        if (!await _databaseHandler.UserExists(_user.Email))
+        
+        if (await _databaseHandler.UserExists(_user.Email))
         {
-            await _databaseHandler.SaveUser(_user);
-            return _user;
+            return null;
         }
+        
+        if (await _databaseHandler.SaveUser(_user)) return _user;
         
         _databaseHandler.Dispose();
         _user.Dispose();
-        return null;
+        return null!;
     }
 
     public async Task<User> Login(UserDto request)
     {
         if (!await _databaseHandler.UserExists(request.Email))
         {
-            _user.Dispose();
-            return _user;
+            request.Dispose();
+            return null!;
         }
-
-        if (!BCrypt.Net.BCrypt.Verify(request.Password, _databaseHandler.ReadUser(request).PasswordHash))
-        {
-            _user.Dispose();
-            return _user;
-        }
-
-        _user = _databaseHandler.ReadUser(request);
-        Console.WriteLine(_user.Email);
-
-        return _user;
+        
+        _user = (await _databaseHandler.ReadUser(request))!;
+        
+        if (BCrypt.Net.BCrypt.Verify(request.Password, _user!.PasswordHash)) return _user;
+        
+        request.Dispose();
+        return null!;
     }
     
     public async Task<bool> ValidateUser(MessageDto messageDto)
     {
-        if (!await _databaseHandler.UserExists(messageDto.Email))
-        {
-            Console.WriteLine("Not validated");
-            return false;
-        }
-        Console.WriteLine("Validated");
-        return true;
+        return await _databaseHandler.UserExists(messageDto.Email);
     }
     
     public string CreateToken(User user)
@@ -81,12 +72,12 @@ public class LoginHandler : ILoginHandler
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.UserData, user.License)
         };
-
+        
         SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
             _configuration.GetSection("AppSettings:Token").Value!));
-
+        
         SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
+        
         JwtSecurityToken token = new JwtSecurityToken(
             claims: claims,
             expires: DateTime.Now.AddDays(1),
@@ -94,7 +85,7 @@ public class LoginHandler : ILoginHandler
         );
         
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
+        
         return jwt;
     }
 }
