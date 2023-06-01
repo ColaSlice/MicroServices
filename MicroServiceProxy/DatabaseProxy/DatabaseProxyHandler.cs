@@ -41,7 +41,7 @@ public class DatabaseProxyHandler : IDatabaseProxyHandler
         catch (Exception e)
         {
             Console.WriteLine(e);
-            //_loggerHandler.Log($"Exception: {e}");
+            _loggerHandler.Log($"Exception: {e}");
             _client.Dispose();
             throw;
         }
@@ -62,7 +62,7 @@ public class DatabaseProxyHandler : IDatabaseProxyHandler
         }
         catch (Exception e)
         {
-            //_loggerHandler.Log($"Exception: {e}");
+            _loggerHandler.Log($"Exception: {e}");
             _client.Dispose();
             throw;
         }
@@ -81,7 +81,7 @@ public class DatabaseProxyHandler : IDatabaseProxyHandler
         catch (Exception e)
         {
             Console.WriteLine(e);
-            //_loggerHandler.Log($"Exception: {e}");
+            _loggerHandler.Log($"Exception: {e}");
             _client.Dispose();
             throw;
         }
@@ -99,7 +99,7 @@ public class DatabaseProxyHandler : IDatabaseProxyHandler
         }
         catch (Exception e)
         {
-            //_loggerHandler.Log($"Exception: {e}");
+            _loggerHandler.Log($"Exception: {e}");
             _client.Dispose();
             throw;
         }
