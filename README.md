@@ -1,3 +1,5 @@
+_**For a student project. Not really intended for others to run.**_
+
 # MicroServices
 A collection of services working together to create a microservice
 
