@@ -1,4 +1,4 @@
-_**For a student project. Not really intended for others to run.**_
+_**For a student project. Not really intended for others to run. And as this were meant to be a student project, some api keys might not have been in the correct places/handled correctly.**_
 
 # MicroServices
 A collection of services working together to create a microservice
